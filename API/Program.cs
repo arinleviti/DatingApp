@@ -1,23 +1,15 @@
-using API.Data;
-using Microsoft.EntityFrameworkCore;
+using API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+//check out the class in the Extensions folder called ApplicationServiceExtensions.cs.
+//This class contains an extension method that adds services to the IServiceCollection.
+builder.Services.AddApplicationServices(builder.Configuration);
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-
-//It registers your DataContext with dependency injection.
-//You pass a configuration function that tells ASP.NET Core how to set it up.
-//You use the UseSqlite method to tell Entity Framework Core to use SQLite as the database provider.
-//Once the DbContextOptionsBuilder has finished building the options, it produces an instance of DbContextOptions, 
-// which is then passed to the DbContext constructor.
-builder.Services.AddDbContext<DataContext>(opt =>
-{
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-builder.Services.AddCors();
+//check out the class in the Extensions folder called IdentityServiceExtensions.cs.
+//This class contains an extension method that adds services to the IServiceCollection.
+builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -30,8 +22,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+//app.UseAuthorization();
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200", "https://localhost:4200"));
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
