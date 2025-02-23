@@ -17,6 +17,13 @@ export class AccountService {
   The <User> part tells TypeScript what type the response will be.
    The <T> in post<T> determines the type of data returned by the HTTP request, which in turn affects what is passed to .set().
    localStorage is a built-in Web API that allows storing key-value pairs in the user's browser persistently (even after a page refresh).*/
+
+  /* Why Doesn’t login() Have subscribe()?
+  Observables Should Be Subscribed to Where They Are Used
+
+  login() returns an Observable<User>, so the component calling it should subscribe.
+  The AccountService just prepares the request, while the component decides what to do with the response. */
+
   login(model: any) {
     return this.http.post<User>(this.baseUrl + 'account/login', model).pipe(
       map(user => {
