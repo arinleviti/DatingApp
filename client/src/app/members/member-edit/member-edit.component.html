@@ -69,7 +69,8 @@
                     </div>
                 </form>
             </tab>
-            <tab heading="Edit Photos"> Photo edit will go here </tab>
+            <!-- when photoeditor emits the memberChange event, the parent receives the event and runs the method onMemberChange -->
+            <tab heading="Edit Photos"> <app-photo-editor [member] = "member" (memberChange)="onMemberChange($event)"></app-photo-editor> </tab>
         </tabset>
     </div>
 </div>

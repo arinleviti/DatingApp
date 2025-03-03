@@ -46,7 +46,7 @@
                 <tab heading="Photos" #photoTab="tab">
                     @if (photoTab.active) {
                         <!-- [items] load items array GalleryItem[] -->
-                        <gallery [items]="images" class="gallery"></gallery>
+                        <gallery [items]="images" [itemAutosize]="true" class="gallery"></gallery>
                     }
                     
                 </tab>
