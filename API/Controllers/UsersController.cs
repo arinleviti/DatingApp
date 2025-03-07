@@ -10,6 +10,7 @@ using API.DTOs;
 using System.Security.Claims;
 using API.Extensions;
 using API.Services;
+using API.Helpers;
 namespace API;
 
 [Authorize]
@@ -26,9 +27,13 @@ public class UsersController : BaseClassController
     }
     
     [HttpGet]
-    public async Task< ActionResult<IEnumerable<MemberDto>>> GetUsers()
+    public async Task< ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UsersParams userParams)
     {
-        var users = await _userRepository.GetMembersAsync();
+        userParams.CurrentUser = User.GetUsername();
+        
+        var users = await _userRepository.GetMembersAsync(userParams);
+
+        Response.AddPaginationHeader(users);
         //you need to use Ok(users) instead of simply returning users because the Ok method is part of the ASP.NET Core's IActionResult return type, 
         // which allows you to control the HTTP response and return additional information, such as the status code, headers, and the actual data.
         

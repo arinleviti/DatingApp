@@ -28,7 +28,8 @@ public class TokenService (IConfiguration config) : ITokenService
         //Claims can include any other user-related data you might need (such as roles or email), but in this example, it’s just the UserName.
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, user.UserName)
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.UserName)
         };
         //SigningCredentials specify the algorithm used for signing the token and the key that will be used for the signing. 
         //Here, the algorithm used is HmacSha512Signature, which is an HMAC (Hash-based Message Authentication Code) using SHA-512.
