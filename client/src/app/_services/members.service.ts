@@ -7,6 +7,7 @@ import { Photo } from '../_models/photo';
 import { PaginatedResult } from '../_models/pagination';
 import { UserParams } from '../_models/userParams';
 import { AccountService } from './account.service';
+import { setPaginatedResponse, setPaginationHeaders } from './paginationHelper';
 
 
 @Injectable({
@@ -29,12 +30,12 @@ resetUserParams() {
 
   getMembers() {
     const response = this.memberCache.get(Object.values(this.userParams()).join('-'));
-    if (response) return this.setPaginatedResponse(response);
+    if (response) return setPaginatedResponse(response, this.paginatedResult);
 
     console.log(Object.values(this.userParams()).join('-'));
 
     /* HttpParams It's used to construct the parameters that will be added to the URL when making a request. */
-    let params = this.setPaginationHeaders(this.userParams().pageNumber, this.userParams().pageSize);
+    let params = setPaginationHeaders(this.userParams().pageNumber, this.userParams().pageSize);
     params = params.append('minAge', this.userParams().minAge.toString());
     params = params.append('maxAge', this.userParams().maxAge.toString());
     params = params.append('gender', this.userParams().gender);
@@ -45,13 +46,13 @@ resetUserParams() {
 params: These are the query parameters (pageNumber and pageSize) that were built earlier. */
     return this.http.get<Member[]>(this.baseUrl + 'users', {observe: 'response', params}).subscribe({
       next:response => {
-        this.setPaginatedResponse(response);
+        setPaginatedResponse(response, this.paginatedResult);
         this.memberCache.set(Object.values(this.userParams()).join('-'), response);
       }
       })
    
   }
-
+/* 
   private setPaginatedResponse(response: HttpResponse<Member[]>) {
     this.paginatedResult.set({
       items: response.body as Member[],
@@ -67,7 +68,7 @@ params: These are the query parameters (pageNumber and pageSize) that were built
     
   }
   return params;
-}
+} */
 
   getMember(username: string)
   {

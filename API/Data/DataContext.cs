@@ -13,4 +13,35 @@ namespace API.Data;
 public class DataContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<AppUser> Users { get; set; }
+    public DbSet<UserLike> Likes { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        /* Composite Key: In the UserLike class, SourceUserId and TargetUserId
+         are combined to form a composite primary key. This means that both columns together uniquely identify each record in the UserLikes table. 
+         Why?: A UserLike represents a relationship between two users (one liking the other), and we don't want a single user to like another user multiple times,
+          hence using both user IDs as a composite key.*/
+        builder.Entity<UserLike>()
+            .HasKey(key => new { key.SourceUserId, key.TargetUserId });
+        
+        builder.Entity<UserLike>()
+        /* establishes that each UserLike belongs to one SourceUser, who is the user doing the liking. */
+            .HasOne(s => s.SourceUser)
+            /* establishes that one AppUser (the SourceUser) can have many UserLike instances where they are the "liker." */
+            .WithMany(l => l.LikedUsers)
+            /* specifies that SourceUserId in the UserLike table is the foreign key that connects the UserLike to the AppUser table (the SourceUser). */
+            .HasForeignKey(s => s.SourceUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<UserLike>()
+            /* establishes that each UserLike also belongs to one TargetUser, who is the user being liked. */
+            .HasOne(s => s.TargetUser)
+            /* establishes that one AppUser (the TargetUser) can have many UserLike instances where they are the "liked" user. */
+            .WithMany(l => l.LikedByUsers)
+            .HasForeignKey(s => s.TargetUserId)
+            //on Sql Server use NoAction instead of Cascade
+            .OnDelete(DeleteBehavior.Cascade);
+    }
 }
