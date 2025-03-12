@@ -10,6 +10,7 @@ import { NotFoundComponent } from './errors/not-found/not-found.component';
 import { ServerErrorComponent } from './errors/server-error/server-error.component';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { preventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
+import { memberDetailedResolver } from './_resolvers/member-detailed.resolver';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -21,7 +22,10 @@ export const routes: Routes = [
             { path: 'members', component: MemberListComponent },
             /* The :username part is a route parameter. It acts as a placeholder
              that will be replaced by an actual value when a user navigates to a URL like /members/johnDoe. */
-            { path: 'members/:username', component: MemberDetailComponent },
+
+             /* The resolver fetches the Member data before MemberDetailComponent is loaded, 
+             ensuring that the component already has the member object available when it initializes. */
+            { path: 'members/:username', component: MemberDetailComponent, resolve: {member: memberDetailedResolver}},
             { path: 'member/edit', component: MemberEditComponent, canDeactivate:[preventUnsavedChangesGuard] },
             { path: 'lists', component: ListsComponent },
             { path: 'messages', component: MessagesComponent },
