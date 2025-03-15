@@ -1,4 +1,6 @@
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
@@ -10,15 +12,34 @@ namespace API.Data;
 //It allows you to execute raw SQL queries.
 //It allows you to add, update, and remove entities from the database.
 //EF Core reads these properties and figures out how to structure the database.
-public class DataContext(DbContextOptions options) : DbContext(options)
+public class DataContext(DbContextOptions options) : IdentityDbContext<AppUser, AppRole, int,
+ IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>(options)
+
+/* We can remove this since IdentityDbContext comes with a DbSet for our users */
 {
-    public DbSet<AppUser> Users { get; set; }
+/*     public DbSet<AppUser> Users { get; set; } */
     public DbSet<UserLike> Likes { get; set; }
     public DbSet<Message> Messages { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+    /* The use of HasMany and WithOne is due to the fact that UserRoles is a collection, 
+    while User in AppUserRole is a single object reference. */
+        builder.Entity<AppUser>()
+        .HasMany(ur => ur.UserRoles)
+        /* The .WithOne(u => u.User) means that each AppUserRole instance can only have one associated AppUser.
+         In other words, each AppUserRole instance will be linked to one user. */
+        .WithOne(u => u.User)
+        .HasForeignKey(ur => ur.UserId)
+        .IsRequired();
+
+         builder.Entity<AppRole>()
+        .HasMany(ur => ur.UserRoles)
+        .WithOne(u => u.Role)
+        .HasForeignKey(ur => ur.RoleId)
+        .IsRequired();
 
         /* Composite Key: In the UserLike class, SourceUserId and TargetUserId
          are combined to form a composite primary key. This means that both columns together uniquely identify each record in the UserLikes table. 

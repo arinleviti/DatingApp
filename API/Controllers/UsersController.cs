@@ -26,6 +26,7 @@ public class UsersController : BaseClassController
         _photoService = photoService;
     }
     
+
     [HttpGet]
     public async Task< ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UsersParams userParams)
     {
@@ -41,6 +42,7 @@ public class UsersController : BaseClassController
         
         return Ok(users);
     }
+
 
     [HttpGet("{username}")]  // /api/users/3
     public async Task<ActionResult<MemberDto>> GetUser(string username)

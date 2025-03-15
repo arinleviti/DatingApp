@@ -5,13 +5,14 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace API.Services;
 
-public class TokenService (IConfiguration config) : ITokenService
+public class TokenService (IConfiguration config, UserManager<AppUser> userManager) : ITokenService
 {
-    public string CreateToken(AppUser user)
+    public async Task<string> CreateToken(AppUser user)
     {
         //config is a dictionary that contains all the key-value pairs from the appsettings.json file
         //?? is the null-coalescing operator, which returns the value of its left-hand operand if the operand is not null; 
@@ -22,7 +23,7 @@ public class TokenService (IConfiguration config) : ITokenService
         //Here, the tokenKey (the string value from the config) is converted into a byte[] using UTF-8 encoding. 
         // This byte array is then used to create a SymmetricSecurityKey (which is a key that can be used for both encryption and decryption).
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
-
+        if (user.UserName == null) throw new Exception ("No username for user");
         //Claims are pieces of information about the user that will be included in the token.
         //In this case, the ClaimTypes.NameIdentifier is used to store the username of the user.
         //Claims can include any other user-related data you might need (such as roles or email), but in this example, it’s just the UserName.
@@ -31,6 +32,10 @@ public class TokenService (IConfiguration config) : ITokenService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.UserName)
         };
+
+        var roles = await userManager.GetRolesAsync(user);
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
         //SigningCredentials specify the algorithm used for signing the token and the key that will be used for the signing. 
         //Here, the algorithm used is HmacSha512Signature, which is an HMAC (Hash-based Message Authentication Code) using SHA-512.
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);

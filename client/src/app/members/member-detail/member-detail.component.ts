@@ -36,14 +36,18 @@ Route data (resolve data from the router) */
 
 ngOnInit(): void {
    /* The resolver fetches the Member data before MemberDetailComponent is loaded, 
- ensuring that the component already has the member object available when it initializes. */
+ ensuring that the component already has the member object available when it initializes.
+ When using a resolver, the resolved data is attached to the data property of the ActivatedRoute and is wrapped inside an observable. 
+ That's why you need to subscribe to this.route.data to access it.
+ this.route.data.subscribe() gets the resolved member data from the resolver */
 this.route.data.subscribe({
   next: data => {
     this.member = data['member'];
     this.member && this.member.photos.map(p => { this.images.push(new ImageItem({src: p.url, thumb: p.url}))})
   }
 })
-   /* this.route.queryParams is an Observable that emits whenever the query parameters in the URL change. */
+   /* this.route.queryParams is an Observable that emits whenever the query parameters in the URL change. 
+   */
    this.route.queryParams.subscribe({
     next: params => {
       params['tab'] && this.selectTab(params['tab'])
