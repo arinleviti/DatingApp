@@ -3,6 +3,7 @@ using System.Text;
 using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
@@ -31,6 +32,25 @@ public static class IdentityServiceExtensions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
                     ValidateIssuer = false,
                     ValidateAudience = false
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context => 
+                    {
+                        /* This means that the client can send the JWT token in the URL as a query parameter when trying to connect to a SignalR hub. */
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var path = context.HttpContext.Request.Path;
+                        /* checks if the incoming request is targeting a SignalR hub */
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            /* If the token is found in the query string and the request is going to a SignalR hub,
+                             the token is assigned to the context.Token property */
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
 
             });

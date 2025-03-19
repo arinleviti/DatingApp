@@ -15,7 +15,11 @@
     </div>
     <div class="card-body p-1">
        <h6 class="card-title text-center mb-1">
-        <i class="fa fa-user me-2"></i>
+        <!-- If isOnline() returns true, is-online will be added to <span>. This is property binding in Angular.-->
+        <span [class.is-online]="isOnline()">
+            <i class="fa fa-user me-2"></i>
+        </span>
+        
         {{member().knownAs}}, {{member().age}}
         @if (hasLiked())
         {
