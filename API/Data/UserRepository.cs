@@ -61,11 +61,11 @@ public class UserRepository(DataContext context, IMapper mapper) : IUserReposito
         .ToListAsync();
     }
 
-    public async Task<bool> SaveAllAsync()
+    /* public async Task<bool> SaveAllAsync()
     {
         //this method returns an integer so as long as the number is greater than zero, something has been saved.
         return await context.SaveChangesAsync() >0 ;
-    }
+    } */
 
     //this method is pretty useless because it doesn't really update the database. EF tracks the entity anyway   
     public void Update(AppUser user)

@@ -70,7 +70,7 @@ public class MessageRepository (DataContext context, IMapper mapper) : IMessageR
 
     public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUserName, string recipientUsername)
     {
-        var messages = await context.Messages
+        var query = context.Messages
  /*        .Include(x=> x.Sender).ThenInclude(x=>x.Photos)
         .Include(x=>x.Recipient).ThenInclude(x => x.Photos) */
         .Where(x => 
@@ -78,17 +78,18 @@ public class MessageRepository (DataContext context, IMapper mapper) : IMessageR
          x.SenderUsername == currentUserName && x.SenderDeleted == false && x.RecipientUsername == recipientUsername)
          .OrderBy(x=> x.MessageSent)
          /* Projects the query results directly into the specified DTO (MessageDto) */
-         .ProjectTo<MessageDto>(mapper.ConfigurationProvider)
-         .ToListAsync();
+        /*  .ProjectTo<MessageDto>(mapper.ConfigurationProvider)
+         .ToListAsync(); */
+         .AsQueryable();
 
-         var unreadMessages = messages.Where(x => x.DateRead == null && x.RecipientUsername == currentUserName).ToList();
+         var unreadMessages = query.Where(x => x.DateRead == null && x.RecipientUsername == currentUserName).ToList();
 
          if (unreadMessages.Count != 0)
          {
             unreadMessages.ForEach(x=>x.DateRead = DateTime.UtcNow);
-            await context.SaveChangesAsync();
+            /* await context.SaveChangesAsync(); */
          }
-         return messages /* mapper.Map<IEnumerable<MessageDto>>(messages) */;
+         return await query.ProjectTo<MessageDto>(mapper.ConfigurationProvider).ToListAsync(); /* mapper.Map<IEnumerable<MessageDto>>(messages) */;
     }
 
     public void RemoveConnection(Connection connection)
@@ -96,8 +97,8 @@ public class MessageRepository (DataContext context, IMapper mapper) : IMessageR
         context.Connections.Remove(connection);
     }
 
-    public async Task<bool> SaveAllAsync()
+   /*  public async Task<bool> SaveAllAsync()
     {
        return await context.SaveChangesAsync() >0;
-    }
+    } */
 }
