@@ -67,7 +67,7 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<AppUser, 
             .WithMany(l => l.LikedByUsers)
             .HasForeignKey(s => s.TargetUserId)
             //on Sql Server use NoAction instead of Cascade
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
 /* For the Message entity, however, you're not creating a many-to-many relationship, but rather two one-to-many relationships: */
             builder.Entity<Message>()

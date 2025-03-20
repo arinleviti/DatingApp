@@ -9,7 +9,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, TextInputComponent, NgIf, DatePickerComponent],
+  imports: [ReactiveFormsModule, TextInputComponent, DatePickerComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })

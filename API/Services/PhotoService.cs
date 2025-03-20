@@ -27,7 +27,7 @@ public class PhotoService : IPhotoService
                Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face"),
                Folder ="datingapp"
            };
-           uploadResult = _cloudinary.Upload(uploadParams);
+           uploadResult = await _cloudinary.UploadAsync(uploadParams);
        }
        return uploadResult;
     }
