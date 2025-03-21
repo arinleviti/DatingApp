@@ -17,12 +17,14 @@ export class MemberMessagesComponent implements AfterViewChecked {
 /*   messages= input.required<Message[]>(); */
   messageContent = '';
 /*   updateMessages = output<Message>(); */
+loading = false;
   
   sendMessage() {
+    this.loading = true;
     this.messageService.sendMessage(this.username(), this.messageContent).then(() => {
       this.messageForm?.reset();
       this.scrollToBottom();
-    })
+    }).finally(() => this.loading = false);
   }
 
   /* It runs after ngAfterViewInit(), whenever Angular performs change detection on the component.
